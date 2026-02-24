@@ -1,49 +1,144 @@
-github.com/amalalghoul2006-art/mixture-_lab-<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>محاكاة فصل المخاليط - الصف الثالث</title>
+    <title>مختبر الفصل بالترشيح والغربلة 🔬</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background-color: #f0f8ff; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: inline-block; }
-        .beaker { width: 150px; height: 180px; border: 3px solid #333; border-top: none; border-radius: 0 0 20px 20px; margin: 20px auto; position: relative; background: #eee; }
-        .mixture { position: absolute; bottom: 0; width: 100%; height: 50px; background: #c2b280; border-radius: 0 0 17px 17px; } /* رمل */
-        .salt { position: absolute; bottom: 10px; width: 100%; height: 5px; background: white; } /* ملح */
-        button { padding: 10px 20px; font-size: 18px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 5px; margin: 10px; }
-        button:hover { background-color: #218838; }
-        #status { font-weight: bold; color: #007bff; margin-top: 20px; }
+        body { font-family: 'Cairo', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .lab-card { background: white; padding: 25px; border-radius: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); text-align: center; width: 750px; border: 8px solid #37474f; }
+        
+        .box-title { background: #0288d1; color: white; padding: 12px; border-radius: 15px; margin: 20px 0; font-size: 18px; font-weight: bold; }
+        .box-title.sieve { background: #fb8c00; }
+
+        .exp-area { display: flex; justify-content: space-around; align-items: flex-end; height: 250px; background: #fafafa; border-radius: 20px; position: relative; padding: 20px; border: 2px solid #ddd; }
+
+        /* أدوات الترشيح */
+        .beaker { width: 80px; height: 100px; border: 3px solid #555; border-top: none; border-radius: 0 0 15px 15px; position: relative; background: rgba(255,255,255,0.5); cursor: grab; z-index: 10; }
+        .water-salt { position: absolute; bottom: 0; width: 100%; height: 70%; background: #b3e5fc; border-radius: 0 0 12px 12px; }
+        .salt-grains { position: absolute; width: 100%; height: 100%; background-image: radial-gradient(#fff 15%, transparent 20%); background-size: 8px 8px; }
+        
+        .filter-paper { width: 100px; height: 40px; background: #eee; border: 2px solid #ccc; border-radius: 50% 50% 10px 10px; position: absolute; top: 110px; left: 60%; }
+        .filtered-water { position: absolute; bottom: 0; width: 100%; height: 0%; background: #03a9f4; transition: 2s; border-radius: 0 0 12px 12px; }
+
+        /* أدوات الغربلة */
+        .sieve-tool { width: 120px; height: 30px; border: 4px solid #795548; background: repeating-linear-gradient(45deg, #ddd, #ddd 2px, #bbb 2px, #bbb 4px); border-radius: 5px; position: absolute; bottom: 120px; cursor: pointer; }
+        .flour-pile { position: absolute; bottom: 0; width: 100%; height: 0%; background: #fff; border-radius: 0 0 10px 10px; transition: 1s; }
+        .lentil { position: absolute; font-size: 15px; transition: 0.5s; }
+
+        button { padding: 10px 20px; font-size: 15px; cursor: pointer; border-radius: 12px; border: none; color: white; font-weight: bold; margin: 10px; transition: 0.3s; }
+        .btn-audio { background: #e91e63; width: 100%; }
+        .btn-reset { background: #f44336; }
+        #status { font-weight: bold; color: #37474f; margin-top: 15px; background: #e1f5fe; padding: 10px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>مختبر العلوم: فصل الملح عن الرمل</h1>
-        <p>لدينا مخلوط من الرمل والملح، كيف نفصلهما؟</p>
+<div class="lab-card">
+    <button class="btn-audio" onclick="initAudio()">🔊 تفعيل الصوت أولاً</button>
+
+    <div class="box-title">1️⃣ فصل الملح عن الماء بالترشيح</div>
+    <div class="exp-area" id="filtrationArea">
+        <div id="saltBeaker" class="beaker" draggable="true" ondragend="doFiltration()">
+            <div class="water-salt"><div class="salt-grains"></div></div>
+            <p style="font-size: 10px; margin-top: -20px;">اسحبني للصب</p>
+        </div>
         
-        <div class="beaker" id="cup">
-            <div class="mixture" id="sand"></div>
-            <div class="salt" id="salt"></div>
+        <div class="beaker" style="cursor: default;">
+            <div class="filter-paper" id="paper"></div>
+            <div id="targetWater" class="filtered-water"></div>
         </div>
-
-        <div id="controls">
-            <button onclick="addWater()">1. أضف الماء (للإذابة)</button>
-            <button onclick="filter()">2. استخدم المصفاة (الترشيح)</button>
-        </div>
-
-        <p id="status">اضغط على الخطوة الأولى للبدء!</p>
     </div>
 
-    <script>
-        function addWater() {
-            document.getElementById('cup').style.background = "#add8e6"; // لون الماء
-            document.getElementById('status').innerText = "الآن ذاب الملح في الماء، وبقي الرمل في القاع.";
-        }
+    <div class="box-title sieve">2️⃣ فصل الطحين عن العدس بالغربلة</div>
+    <div class="exp-area" id="sieveArea">
+        <div id="flourBeaker" class="beaker" draggable="true" ondragend="doSieving()">
+            <div style="position:absolute; bottom:0; width:100%; height:80%; background:#fff; opacity:0.9;">
+                 <div id="lentilsInBeaker"></div>
+            </div>
+        </div>
 
-        function filter() {
-            document.getElementById('sand').style.display = "none";
-            document.getElementById('status').innerText = "أحسنت! تم فصل الرمل بواسطة الترشيح، وبقي الماء المملح.";
+        <div style="position:relative; width:150px; text-align:center;">
+            <div id="sieve" class="sieve-tool" onclick="shakeSieve()"></div>
+            <div class="beaker" style="width:120px; margin-top:40px;">
+                <div id="fallingFlour" class="flour-pile"></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-reset" onclick="resetAll()">🔄 إعادة المختبر</button>
+    <div id="status">مرحباً معلمتي! اسحبي الكؤوس لصبها فوق الفلاتر.</div>
+</div>
+
+<script>
+    let audioCtx;
+    function initAudio() {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        beep(440, 0.2);
+        document.getElementById('status').innerText = "تم تفعيل الصوت! ✅";
+    }
+
+    function beep(freq, duration) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = freq; osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    // تجربة الترشيح
+    function doFiltration() {
+        beep(300, 0.5); // صوت صب الماء
+        document.getElementById('saltBeaker').style.transform = "rotate(-40deg) translate(-50px, -50px)";
+        setTimeout(() => {
+            document.getElementById('targetWater').style.height = "80%";
+            document.getElementById('paper').innerHTML = "<div class='salt-grains'></div>";
+            document.getElementById('status').innerText = "نجح الترشيح! الملح بقي على الورقة والماء نزل للأسفل.";
+            beep(600, 0.2);
+        }, 1000);
+    }
+
+    // تجربة الغربلة
+    function doSieving() {
+        beep(200, 0.5);
+        document.getElementById('flourBeaker').style.transform = "rotate(-40deg) translate(-30px, -50px)";
+        document.getElementById('status').innerText = "اضغطي على الغربال لهزه وفصل الطحين!";
+        // إضافة العدس فوق الغربال
+        const sieve = document.getElementById('sieve');
+        for(let i=0; i<8; i++) {
+            let l = document.createElement('div');
+            l.className = 'lentil'; l.innerHTML = "🟤";
+            l.style.left = Math.random()*80 + "%";
+            l.style.top = "-10px";
+            sieve.appendChild(l);
         }
-    </script>
+    }
+
+    function shakeSieve() {
+        const sieve = document.getElementById('sieve');
+        sieve.style.animation = "shake 0.1s infinite";
+        beep(150, 0.1);
+        setTimeout(() => {
+            sieve.style.animation = "";
+            document.getElementById('fallingFlour').style.height = "100%";
+            document.getElementById('status').innerText = "رائع! الطحين الناعم نزل وبقي العدس الكبير في الغربال.";
+            beep(800, 0.3);
+        }, 1500);
+    }
+
+    function resetAll() {
+        location.reload(); // أسهل طريقة لإعادة كل شيء
+    }
+</script>
+
+<style>
+    @keyframes shake {
+        0% { transform: translateX(0); }
+        50% { transform: translateX(10px); }
+        100% { transform: translateX(0); }
+    }
+</style>
 
 </body>
 </html>
